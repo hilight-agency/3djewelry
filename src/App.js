@@ -53,18 +53,13 @@ function Metal(props) {
 }
 
 export default function App() {
-  const envMap = useControls('Environment', {
-    background: false,
-    files: "/1.hdr",
-    ground: { scale: 50 }
-  })  
   return (
-    <Canvas camera={{ position: [-5, 0.5, 5], fov: 45 }}>
+    <Canvas camera={{ fov: 60 }} >
       <Metal  scale={100}/>
       <Ring   scale={0.1} />
       <ambientLight color={'white'} intensity={4} />
-      <Environment {...envMap}/>
-      <OrbitControls makeDefault autoRotate autoRotateSpeed={0.1} minPolarAngle={0} maxPolarAngle={Math.PI / 2} />
+      <OrbitControls makeDefault autoRotate autoRotateSpeed={0.5} />
+      <Environment files={"/1.hdr"} background={false}/>
     </Canvas>
   )
 }
