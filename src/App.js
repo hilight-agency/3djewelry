@@ -1,63 +1,70 @@
-import { useRef, useLayoutEffect } from 'react'
-import { Canvas, useLoader } from '@react-three/fiber'
-import { useGLTF, OrbitControls, MeshRefractionMaterial, Environment } from '@react-three/drei'
-import { useControls } from 'leva'
-import { RGBELoader } from 'three-stdlib'
+import { useRef } from 'react'
+import { Canvas } from '@react-three/fiber'
+import { useGLTF, OrbitControls, MeshRefractionMaterial, useCubeTexture, CubeCamera, Environment } from '@react-three/drei'
 
 function Ring(props) {
-  const texture2 = useLoader(RGBELoader, '/1.hdr')
   const ref = useRef()
-  const { nodes } = useGLTF('/camni.glb')
+  const texture = useCubeTexture(
+    ["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"],
+    { path: "gemsmap/" }
+  );
+  const { nodes } = useGLTF('/gem.glb')
   return (
     <group ref={ref} rotation={[-Math.PI / 2, 0, 0]} {...props}>
-    <mesh
-      castShadow
-      receiveShadow
-      geometry={nodes['Layer_01(1B21DE05-E3AC-4C62-9547-4FFBA3C8A566)'].geometry}
-      >
-        <MeshRefractionMaterial 
-        envMap={texture2} 
-        bounces={2}
-        aberrationStrength={0.01}
-        ior={ 2.4}
-        color={'white'}
-        fastChroma
-         />
+      <mesh geometry={nodes['Layer_01(F515426E-294D-4FC4-832F-9BAC280D6A14)'].geometry}      >
+        <MeshRefractionMaterial
+          envMap={texture}
+          bounces={2}
+          aberrationStrength={0.01}
+          ior={2.4}
+          color={'white'}
+          fastChroma
+        />
       </mesh>
-    <mesh
-      castShadow
-      receiveShadow
-      geometry={nodes['Layer_01(822F5737-2B27-440C-B7D3-13B5C206F91D)'].geometry}
-      >
-        <MeshRefractionMaterial 
-        envMap={texture2}
-        bounces={2}
-        aberrationStrength={0.01}
-        ior={ 2.4}
-        color={'blue'}
-        fastChroma
- />
-      </mesh>
-  </group>
+    </group>
   )
 }
 
-function Metal(props) {
-  const { scene } = useGLTF('/metal.glb')
-  useLayoutEffect(() => {
-    scene.traverse((obj) => obj.isMesh && (obj.receiveShadow = obj.castShadow = true))
-  })
-  return <primitive object={scene} {...props} />
+function Model(props) {
+  const { nodes, materials } = useGLTF('/met.glb')
+  const texture = useCubeTexture(
+    ["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"],
+    { path: "metalmap/" }
+  );
+  materials['Silver Polished #1'].envMap = texture;
+  console.log(nodes);
+  return (
+    <group {...props} dispose={null}>
+      <group scale={0.001}>
+        <group rotation={[-Math.PI / 2, 0, 0]}>
+          <mesh
+            castShadow
+            receiveShadow
+            geometry={nodes['COLOR=�,MATERIAL=��(17C38827-CF04-41A3-BD5C-83A1DBCE0B94)'].geometry}
+            material={materials['Silver Polished #1']}
+          />
+          <mesh
+            castShadow
+            receiveShadow
+            geometry={nodes['Layer_01(D0460141-C391-4238-B6C5-F8AD57FB3D13)'].geometry}
+            material={materials['Silver Polished #1']}
+          />
+        </group>
+      </group>
+    </group>
+  )
 }
+
+useGLTF.preload('/gem.glb')
+useGLTF.preload('/met.glb')
 
 export default function App() {
   return (
-    <Canvas camera={{ fov: 60, position: [10, 40, 30]  }} >
-      <Metal  scale={100}/>
-      <Ring   scale={0.1} />
+    <Canvas camera={{ fov: 60, position: [10, 40, 30] }} >
+      <Model scale={100} />
+      <Ring scale={0.1} />
       <ambientLight color={'white'} intensity={4} />
-      <OrbitControls makeDefault autoRotate autoRotateSpeed={0.5} enablePan={false} enableDamping={false} minDistance={3} maxDistance={6}/>
-      <Environment files={"/1.hdr"} background={false}/>
+      <OrbitControls makeDefault autoRotate autoRotateSpeed={0.5} enablePan={false} enableDamping={false} minDistance={3} maxDistance={6} />
     </Canvas>
   )
 }
