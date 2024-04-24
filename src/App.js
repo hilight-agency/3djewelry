@@ -15,7 +15,7 @@ function Gems(props) {
       <mesh geometry={nodes['Layer_01(F515426E-294D-4FC4-832F-9BAC280D6A14)'].geometry}      >
         <MeshRefractionMaterial
           envMap={texture}
-          bounces={3}
+          bounces={2}
           aberrationStrength={0.01}
           ior={2.4}
           color={'white'}
@@ -57,7 +57,7 @@ export default function App() {
   const texture = useLoader(RGBELoader, '/metall.hdr')
   return (
     <Canvas camera={{ fov: 60, position: [10, 40, 30] }} >
-      <Environment files={'/metall.hdr'} environmentIntensity={0.4} />
+      <Environment files={'/metall.hdr'} environmentIntensity={1} />
       <Model scale={100} />
       <Gems scale={0.1} />
       <OrbitControls makeDefault autoRotate autoRotateSpeed={0.5} enablePan={false} enableDamping={false} minDistance={3} maxDistance={6} />
