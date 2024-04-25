@@ -54,10 +54,10 @@ useGLTF.preload('/met.glb')
 useGLTF.preload('/gem.glb')
 
 export default function App() {
-  const texture = useLoader(RGBELoader, '/metall.hdr')
+  const texture = useLoader(RGBELoader, '/Ring_Studio_011_V4.hdr')
   return (
     <Canvas camera={{ fov: 60, position: [10, 40, 30] }} >
-      <Environment files={'/metall.hdr'} environmentIntensity={1} />
+      <Environment files={'/Ring_Studio_011_V4.hdr'} environmentIntensity={1} />
       <Model scale={100} />
       <Gems scale={0.1} />
       <OrbitControls makeDefault autoRotate autoRotateSpeed={0.5} enablePan={false} enableDamping={false} minDistance={3} maxDistance={6} />
