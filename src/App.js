@@ -1,7 +1,9 @@
 import { useRef } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
-import { useGLTF, OrbitControls, MeshRefractionMaterial, MeshReflectorMaterial, useCubeTexture, CubeCamera, Environment } from '@react-three/drei'
+import { useGLTF, OrbitControls, MeshRefractionMaterial, Environment } from '@react-three/drei'
 import { RGBELoader } from 'three-stdlib'
+import { useControls } from "leva";
+import { DepthOfField, EffectComposer } from "@react-three/postprocessing";
 function Gems(props) {
   const ref = useRef()
   const texture = useLoader(RGBELoader, '/gems.hdr')
@@ -54,6 +56,26 @@ useGLTF.preload('/met.glb')
 useGLTF.preload('/gem.glb')
 
 export default function App() {
+  const { focusDistance, focalLength, bokehScale } = useControls({
+    focusDistance: {
+      min: 0,
+      max: 1,
+      step: 0.01,
+      value: 0.1
+    },
+    focalLength: {
+      min: 0,
+      step: 0.01,
+      max: 1,
+      value: 0.5
+    },
+    bokehScale: {
+      min: 0,
+      step: 0.01,
+      max: 10,
+      value: 2
+    }
+  });
   const texture = useLoader(RGBELoader, '/Ring_Studio_011_V4.hdr')
   return (
     <Canvas camera={{ fov: 60, position: [10, 40, 30] }} dpr={[1,2]} >
@@ -62,6 +84,13 @@ export default function App() {
       <Model scale={100} />
       <Gems scale={0.1} />
       <OrbitControls makeDefault autoRotate autoRotateSpeed={0.5} enablePan={false} enableDamping={false} minDistance={3} maxDistance={6} />
+      <EffectComposer>
+          <DepthOfField
+            focusDistance={focusDistance}
+            focalLength={focalLength}
+            bokehScale={bokehScale}
+          />
+        </EffectComposer>
     </Canvas>
   )
 }
