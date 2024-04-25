@@ -56,7 +56,13 @@ useGLTF.preload('/met.glb')
 useGLTF.preload('/gem.glb')
 
 export default function App() {
-  const { bgcolor, focusDistance, focalLength, bokehScale } = useControls({
+  const { intensity, bgcolor, focusDistance, focalLength, bokehScale } = useControls({
+    intensity: {
+      min:0,
+      max:10,
+      step:0.1,
+      value:1
+    },
     bgcolor: {
       value: '#fff',      
     },
@@ -81,7 +87,7 @@ export default function App() {
   });
   return (
     <Canvas camera={{ fov: 60, position: [10, 40, 30] }} dpr={[1,2]} >
-      <Environment files={'/Ring_Studio_011_V4.hdr'} environmentIntensity={0.5}/>
+      <Environment files={'/Ring_Studio_011_V4.hdr'} environmentIntensity={intensity}/>
       <color attach="background" args={[bgcolor]} />
       <Model scale={100} />
       <Gems scale={0.1} />
