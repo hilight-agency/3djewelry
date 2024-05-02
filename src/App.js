@@ -22,9 +22,9 @@ function Gems(props) {
       value: '#fff'
     },
     aberrationStrength: {
-      min: 0.01,
-      max: 1,
-      step: 0.01,
+      min: 0.001,
+      max: 0.02,
+      step: 0.001,
       value: 0.01
     }
   })
