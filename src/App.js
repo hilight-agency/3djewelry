@@ -1,9 +1,10 @@
 import { useRef } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
-import { useGLTF, OrbitControls, MeshRefractionMaterial, Environment } from '@react-three/drei'
+import { useGLTF, OrbitControls, MeshRefractionMaterial, Environment, AccumulativeShadows, RandomizedLight } from '@react-three/drei'
 import { RGBELoader } from 'three-stdlib'
 import { useControls } from 'leva'
-import { Bloom, DepthOfField, EffectComposer } from '@react-three/postprocessing'
+import { BlendFunction } from 'postprocessing'
+import { Bloom, DepthOfField, EffectComposer, BrightnessContrast, Vignette } from '@react-three/postprocessing'
 function Gems(props) {
   const ref = useRef()
   const texture = useLoader(RGBELoader, '/gems.hdr')
@@ -75,33 +76,28 @@ useGLTF.preload('/gem.glb')
 export default function App() {
   const general = useControls('General', {
     intensity: {
-      min: 0,
-      max: 10,
-      step: 0.1,
+      min: 0.05,
+      max: 2,
+      step: 0.01,
       value: 1
     },
     bgcolor: {
       value: '#fff'
-    }
-  })
-  const depthOfField = useControls('DepthOfField', {
-    focusDistance: {
+    },
+    brightness: {
       min: 0,
       max: 1,
       step: 0.01,
-      value: 0.1
+      value: 0
     },
-    focalLength: {
+    contrast: {
       min: 0,
-      step: 0.01,
       max: 1,
-      value: 0.5
-    },
-    bokehScale: {
-      min: 0,
       step: 0.01,
-      max: 10,
-      value: 2
+      value: 0
+    },
+    Vignette: {
+      value: true
     }
   })
   const bloom = useControls('bloom', {
@@ -109,20 +105,40 @@ export default function App() {
     intensity: { value: 0, min: 0, max: 10, step: 0.01 },
     levels: { value: 0, min: 0, max: 10, step: 0.01 }
   })
+  const shadow = useControls('Shadows', {
+    active: {
+      value: true
+    },
+    ambient: {
+      min: 0,
+      max: 1,
+      step: 0.01,
+      value: 1
+    }
+  })
   return (
-    <Canvas camera={{ fov: 60, position: [10, 40, 30] }} dpr={[1, 2]}>
+    <Canvas shadows={shadow.active} camera={{ fov: 60, position: [10, 40, 30] }} dpr={[1, 2]}>
       <Environment files={'/Ring_Studio_011_V4.hdr'} environmentIntensity={general.intensity} />
       <color attach="background" args={[general.bgcolor]} />
+      <AccumulativeShadows temporal position={[0, -1, 0]} opacity={1}>
+        <RandomizedLight amount={8} radius={7} ambient={shadow.ambient} position={[15, 25, -10]} bias={0.001} />
+      </AccumulativeShadows>
+
       <Model scale={100} />
       <Gems scale={0.1} />
       <OrbitControls makeDefault autoRotate autoRotateSpeed={0.5} enablePan={false} enableDamping={false} minDistance={3} maxDistance={6} />
       <EffectComposer>
-        <DepthOfField
-          focusDistance={depthOfField.focusDistance}
-          focalLength={depthOfField.focalLength}
-          bokehScale={depthOfField.bokehScale}
-        />
+        <BrightnessContrast brightness={general.brightness} contrast={general.contrast} />
+        <DepthOfField focusDistance={0.1} focalLength={0.5} bokehScale={2} />
         <Bloom luminanceThreshold={bloom.luminanceThreshold} intensity={bloom.intensity} levels={bloom.levels} mipmapBlur />
+        {general.Vignette && (
+          <Vignette
+            offset={0.5} // vignette offset
+            darkness={0.5} // vignette darkness
+            eskil={false} // Eskil's vignette technique
+            blendFunction={BlendFunction.NORMAL} // blend mode
+          />
+        )}
       </EffectComposer>
     </Canvas>
   )
