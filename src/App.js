@@ -5,6 +5,7 @@ import { RGBELoader } from 'three-stdlib'
 import { useControls } from 'leva'
 import { BlendFunction } from 'postprocessing'
 import { Bloom, DepthOfField, EffectComposer, BrightnessContrast, Vignette } from '@react-three/postprocessing'
+import { Color } from 'three'
 function Gems(props) {
   const ref = useRef()
   const texture = useLoader(RGBELoader, '/gems.hdr')
@@ -48,6 +49,14 @@ function Gems(props) {
 
 function Model(props) {
   const { nodes, materials } = useGLTF('/met.glb')
+  const metalConf = useControls('Metal', {
+    color: {
+      value: '#fff',
+      onChange: (v) => {
+        materials['Silver Polished #1'].color = new Color(v)
+      }
+    }
+  })
   return (
     <group {...props} dispose={null}>
       <group scale={0.001}>
